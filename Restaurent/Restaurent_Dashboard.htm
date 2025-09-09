@@ -1,0 +1,1556 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Restaurant Kiosk & Dashboard Application</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #f3f4f6;
+      }
+      .text-gradient {
+        background: linear-gradient(90deg, #1d4ed8, #2563eb);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      .main-bg-gradient {
+        background: #fdfaf7;
+      }
+      /* Navigation button hover underline effect */
+      .nav-underline {
+        position: relative;
+        transition: color 0.2s;
+      }
+      .nav-underline::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0.2rem;
+        height: 0.18rem;
+        background: transparent;
+        border-radius: 2px;
+        transition: background 0.2s;
+      }
+      .nav-underline:hover::after {
+        background: #f5f1f1;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-100 min-h-screen flex flex-col">
+    <div id="app" class="flex-1 flex flex-col">
+      <!-- Main Navigation Header -->
+      <header class="bg-gray-800 shadow-lg p-4 sticky top-0 z-50">
+        <nav
+          class="flex flex-col md:flex-row justify-between items-start md:items-center max-w-7xl mx-auto"
+        >
+          <div class="flex justify-between items-center w-full md:w-auto">
+            <!-- Brand/Logo (Placeholder) -->
+            <span class="text-white text-lg font-bold">Keshav Restro App</span>
+
+            <!-- Mobile Menu Button -->
+            <button id="mobile-menu-btn" class="text-white md:hidden">
+              <svg
+                id="menu-icon"
+                class="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 6h16M4 12h16M4 18h16"
+                ></path>
+              </svg>
+              <svg
+                id="close-icon"
+                class="w-6 h-6 hidden"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M6 18L18 6M6 6l12 12"
+                ></path>
+              </svg>
+            </button>
+          </div>
+
+          <div
+            id="nav-menu"
+            class="hidden md:flex flex-col md:flex-row md:space-x-2 md:space-y-0 space-y-2 mt-4 md:mt-0 w-full md:w-auto"
+          >
+            <button
+              id="showMainPageBtn"
+              class="py-2 px-3 md:px-4 rounded-full text-white font-semibold text-sm md:text-base nav-underline"
+            >
+              Home
+            </button>
+            <button
+              id="showOffersPageBtn"
+              class="py-2 px-3 md:px-4 rounded-full text-white font-semibold text-sm md:text-base nav-underline"
+            >
+              Offers
+            </button>
+            <button
+              id="showOrderPageBtn"
+              class="py-2 px-3 md:px-4 rounded-full text-white font-semibold text-sm md:text-base nav-underline"
+            >
+              Food Menu
+            </button>
+            <button
+              id="showCartPageBtn"
+              class="py-2 px-3 md:px-4 rounded-full text-white font-semibold text-sm md:text-base nav-underline hidden"
+            >
+              Your Cart
+            </button>
+            <button
+              id="showDashboardBtn"
+              class="py-2 px-3 md:px-4 rounded-full text-white font-semibold text-sm md:text-base nav-underline hidden"
+            >
+              Dashboard
+            </button>
+            <button
+              id="showOrderHistoryBtn"
+              class="py-2 px-3 md:px-4 rounded-full text-white font-semibold text-sm md:text-base nav-underline hidden"
+            >
+              Order History
+            </button>
+            <button
+              id="showProfileBtn"
+              class="py-2 px-3 md:px-4 rounded-full text-white font-semibold text-sm md:text-base nav-underline hidden"
+            >
+              Profile
+            </button>
+
+            <div
+              id="auth-nav-buttons"
+              class="flex flex-col md:flex-row md:space-x-2 md:space-y-0 space-y-2 w-full md:w-auto"
+            >
+              <button
+                id="navLoginBtn"
+                class="py-2 px-4 rounded-full text-white font-semibold text-sm md:text-base"
+              >
+                Login
+              </button>
+              <button
+                id="navSignupBtn"
+                class="py-2 px-4 rounded-full text-white font-semibold text-sm md:text-base hidden"
+              >
+                Sign Up
+              </button>
+              <button
+                id="navLogoutBtn"
+                class="py-2 px-4 rounded-full text-white font-semibold text-sm md:text-base hidden"
+              >
+                Logout
+              </button>
+            </div>
+          </div>
+        </nav>
+      </header>
+
+      <!-- Main Content Area -->
+      <main class="flex-1 flex flex-col items-center p-4 main-bg-gradient">
+        <!-- Authentication View -->
+        <div
+          id="auth-view"
+          class="w-full max-w-xs sm:max-w-sm md:max-w-md p-6 sm:p-8 bg-white rounded-2xl shadow-xl border border-gray-200 hidden"
+        >
+          <h2
+            id="auth-title"
+            class="text-3xl sm:text-4xl font-extrabold text-center mb-6 text-gradient"
+          >
+            Login
+          </h2>
+          <form id="auth-form" class="space-y-4 sm:space-y-6">
+            <!-- Form content dynamically generated by JS -->
+          </form>
+          <p
+            id="auth-toggle"
+            class="text-center mt-4 text-gray-600 text-sm sm:text-base"
+          >
+            Don't have an account?
+            <button class="text-blue-600 font-semibold">Sign Up</button>
+          </p>
+        </div>
+
+        <!-- Main Page View -->
+        <div
+          id="main-page"
+          class="w-full h-full p-4 sm:p-6 bg-white rounded-2xl shadow-xl border border-gray-200"
+        >
+          <div class="text-center p-8 sm:p-12">
+            <h1
+              class="text-4xl sm:text-5xl md:text-6xl font-extrabold text-gradient mb-4"
+            >
+              Welcome to Keshav Restaurant!
+            </h1>
+            <p
+              class="text-base sm:text-lg md:text-xl text-gray-700 mb-6 sm:mb-8"
+            >
+              Explore our menu and offers, and sign in to place an order!
+            </p>
+          </div>
+
+          <!-- Trending Section -->
+          <div
+            class="w-full max-w-7xl mx-auto mt-8 p-4 sm:p-6 bg-white rounded-2xl shadow-xl border border-gray-200"
+          >
+            <h2 class="text-3xl font-extrabold text-center mb-6 text-gradient">
+              Trending Now
+            </h2>
+            <div
+              class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
+              id="trending-section"
+            ></div>
+          </div>
+
+          <!-- Traditional Section -->
+          <div
+            class="w-full max-w-7xl mx-auto mt-8 p-4 sm:p-6 bg-white rounded-2xl shadow-xl border border-gray-200"
+          >
+            <h2 class="text-3xl font-extrabold text-center mb-6 text-gradient">
+              Traditional Dishes
+            </h2>
+            <div
+              class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
+              id="traditional-section"
+            ></div>
+          </div>
+
+          <!-- Fast Food Section -->
+          <div
+            class="w-full max-w-7xl mx-auto mt-8 p-4 sm:p-6 bg-white rounded-2xl shadow-xl border border-gray-200"
+          >
+            <h2 class="text-3xl font-extrabold text-center mb-6 text-gradient">
+              Fast Food
+            </h2>
+            <div
+              class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
+              id="fast-food-section"
+            ></div>
+          </div>
+
+          <!-- Regular Food Section -->
+          <div
+            class="w-full max-w-7xl mx-auto mt-8 p-4 sm:p-6 bg-white rounded-2xl shadow-xl border border-gray-200"
+          >
+            <h2 class="text-3xl font-extrabold text-center mb-6 text-gradient">
+              Regular Eats
+            </h2>
+            <div
+              class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
+              id="regular-section"
+            ></div>
+          </div>
+        </div>
+
+        <!-- Offers Page View -->
+        <div
+          id="offers-page"
+          class="w-full h-full p-4 sm:p-6 bg-white rounded-2xl shadow-xl border border-gray-200 hidden"
+        >
+          <h2
+            class="text-3xl sm:text-4xl font-extrabold text-center mb-6 text-gradient"
+          >
+            Special Combos & Offers
+          </h2>
+          <div
+            id="offers-items"
+            class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8"
+          >
+            <!-- Offers will be rendered here by JS -->
+          </div>
+        </div>
+
+        <!-- Order Page View (formerly Kiosk View) -->
+        <div
+          id="order-page"
+          class="w-full h-full p-4 sm:p-6 bg-white rounded-2xl shadow-xl border border-gray-200 hidden"
+        >
+          <h2
+            class="text-3xl sm:text-4xl font-extrabold text-center mb-6 text-gradient"
+          >
+            Place Your Order
+          </h2>
+          <div class="flex-1">
+            <h3 class="text-xl sm:text-2xl font-bold mb-4 text-gray-800">
+              Menu
+            </h3>
+            <div
+              id="menu-items"
+              class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+            >
+              <!-- Menu items will be rendered here by JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Separate Cart Page View -->
+        <div
+          id="cart-view"
+          class="w-full h-full p-4 sm:p-6 bg-white rounded-2xl shadow-xl border border-gray-200 hidden"
+        >
+          <div class="lg:w-1/2 mx-auto">
+            <div
+              class="p-4 sm:p-6 bg-gray-50 rounded-xl border border-gray-200"
+            >
+              <h3 class="text-xl sm:text-2xl font-bold mb-4 text-gray-800">
+                Your Cart
+              </h3>
+              <div id="cart-items" class="space-y-4">
+                <!-- Cart items will be rendered here by JS -->
+              </div>
+              <div
+                id="cart-empty-message"
+                class="text-center text-gray-500 italic py-4 hidden text-sm"
+              >
+                Your cart is empty.
+              </div>
+              <div class="mt-4 sm:mt-6 pt-4 border-t border-gray-300">
+                <div
+                  class="flex justify-between items-center text-lg sm:text-xl font-bold text-gray-800"
+                >
+                  <span>Total:</span>
+                  <span id="cart-total">₹0.00</span>
+                </div>
+                <button
+                  id="checkout-btn"
+                  class="mt-4 sm:mt-6 w-full bg-blue-600 text-white font-semibold py-3 rounded-full shadow-md text-sm sm:text-base"
+                >
+                  Checkout
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Order Confirmation & Bill View -->
+        <div
+          id="order-confirmation-view"
+          class="w-full max-w-md p-6 sm:p-8 bg-white rounded-2xl shadow-xl border border-gray-200 hidden text-center"
+        >
+          <h2 class="text-3xl sm:text-4xl font-extrabold mb-4 text-gradient">
+            Thank You!
+          </h2>
+          <p class="text-base sm:text-lg text-gray-700 mb-6">
+            Your order has been placed successfully.
+          </p>
+          <div
+            id="bill-details"
+            class="bg-gray-50 p-4 rounded-xl border border-gray-200 text-left"
+          >
+            <h3 class="text-xl font-bold mb-2">Your Bill</h3>
+            <div
+              id="bill-items"
+              class="mb-4 text-gray-600 text-sm space-y-1"
+            ></div>
+            <div
+              class="border-t border-gray-300 pt-2 flex justify-between font-bold text-gray-800"
+            >
+              <span>Total:</span>
+              <span id="bill-total"></span>
+            </div>
+          </div>
+          <button
+            id="showOrderStatusBtn"
+            class="mt-6 bg-blue-600 text-white font-semibold py-3 px-6 rounded-full shadow-lg text-sm sm:text-base"
+          >
+            View Order Status
+          </button>
+        </div>
+
+        <!-- Order Status View -->
+        <div
+          id="order-status-view"
+          class="w-full max-w-md p-6 sm:p-8 bg-white rounded-2xl shadow-xl border border-gray-200 hidden text-center"
+        >
+          <h2 class="text-3xl sm:text-4xl font-extrabold mb-4 text-gradient">
+            Order Status
+          </h2>
+          <div
+            id="status-spinner"
+            class="animate-spin h-16 w-16 mx-auto mb-4 border-4 border-blue-500 border-t-transparent rounded-full hidden"
+          ></div>
+          <p class="text-lg sm:text-xl text-gray-700 font-semibold mb-2">
+            Order #<span id="status-order-id"></span>
+          </p>
+          <p
+            id="current-order-status"
+            class="text-base sm:text-lg text-gray-500"
+          >
+            Your order is being prepared!
+          </p>
+        </div>
+
+        <!-- Order History View -->
+        <div
+          id="order-history-view"
+          class="w-full max-w-7xl mx-auto p-4 sm:p-6 bg-white rounded-2xl shadow-xl border border-gray-200 hidden"
+        >
+          <h2
+            class="text-3xl sm:text-4xl font-extrabold text-center mb-6 text-gradient"
+          >
+            My Order History
+          </h2>
+          <div id="history-list" class="space-y-4 sm:space-y-6">
+            <!-- Order history will be rendered here -->
+          </div>
+          <p
+            id="history-empty-message"
+            class="text-center text-gray-500 italic py-6 sm:py-8 hidden"
+          >
+            No past orders to display.
+          </p>
+          <p class="mt-2 text-gray-400 text-center text-sm">
+            You can view order details after a 5-second delivery simulation.
+          </p>
+        </div>
+
+        <!-- Dashboard Interface -->
+        <div
+          id="dashboard-view"
+          class="w-full h-full p-4 sm:p-6 bg-white rounded-2xl shadow-xl border border-gray-200 hidden"
+        >
+          <h2
+            class="text-3xl sm:text-4xl font-extrabold text-center mb-6 text-gradient"
+          >
+            Order Dashboard
+          </h2>
+          <div class="space-y-4 sm:space-y-6">
+            <div
+              id="orders-list"
+              class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"
+            >
+              <!-- Orders will be rendered here by JS -->
+            </div>
+            <div
+              id="dashboard-empty-message"
+              class="text-center text-gray-500 italic py-6 sm:py-8 hidden text-sm sm:text-base"
+            >
+              No orders to display.
+            </div>
+          </div>
+        </div>
+
+        <!-- Profile View -->
+        <div
+          id="profile-view"
+          class="w-full max-w-md p-6 sm:p-8 bg-white rounded-2xl shadow-xl border border-gray-200 hidden"
+        >
+          <h2
+            class="text-3xl sm:text-4xl font-extrabold text-center mb-6 text-gradient"
+          >
+            User Profile
+          </h2>
+          <div id="profile-details" class="space-y-4">
+            <!-- Profile details will be rendered here by JS -->
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      const menuItems = [
+        {
+          id: "burger",
+          name: "Classic Burger",
+          price: 599.0,
+          image: "https://placehold.co/400x400/FF5733/white?text=Burger",
+        },
+        {
+          id: "pizza",
+          name: "Pepperoni Pizza",
+          price: 799.0,
+          image: "https://placehold.co/400x400/C70039/white?text=Pizza",
+        },
+        {
+          id: "sushi",
+          name: "Sushi Roll Set",
+          price: 899.0,
+          image: "https://placehold.co/400x400/900C3F/white?text=Sushi",
+        },
+        {
+          id: "salad",
+          name: "Garden Salad",
+          price: 349.0,
+          image: "https://placehold.co/400x400/DAF7A6/black?text=Salad",
+        },
+        {
+          id: "fries",
+          name: "French Fries",
+          price: 175.0,
+          image: "https://placehold.co/400x400/FFC300/black?text=Fries",
+        },
+        {
+          id: "coke",
+          name: "Coca-Cola",
+          price: 99.0,
+          image: "https://placehold.co/400x400/000000/white?text=Coke",
+        },
+        {
+          id: "nuggets",
+          name: "Chicken Nuggets",
+          price: 429.0,
+          image: "https://placehold.co/400x400/FF5733/white?text=Nuggets",
+        },
+        {
+          id: "shake",
+          name: "Chocolate Shake",
+          price: 250.0,
+          image: "https://placehold.co/400x400/3E2723/white?text=Shake",
+        },
+        {
+          id: "wings",
+          name: "Spicy Chicken Wings",
+          price: 549.0,
+          image: "https://placehold.co/400x400/8B0000/white?text=Wings",
+        },
+        {
+          id: "taco",
+          name: "Beef Taco",
+          price: 199.0,
+          image: "https://placehold.co/400x400/9D5302/white?text=Taco",
+        },
+        {
+          id: "soup",
+          name: "Tomato Soup",
+          price: 299.0,
+          image: "https://placehold.co/400x400/F08080/black?text=Soup",
+        },
+        {
+          id: "icedtea",
+          name: "Iced Tea",
+          price: 125.0,
+          image: "https://placehold.co/400x400/FFD580/black?text=Tea",
+        },
+        {
+          id: "donut",
+          name: "Glazed Donut",
+          price: 85.0,
+          image: "https://placehold.co/400x400/E1BEE7/black?text=Donut",
+        },
+        {
+          id: "coffee",
+          name: "Hot Coffee",
+          price: 110.0,
+          image: "https://placehold.co/400x400/795548/white?text=Coffee",
+        },
+        {
+          id: "sandwich",
+          name: "Club Sandwich",
+          price: 599.0,
+          image: "https://placehold.co/400x400/D2B48C/black?text=Sandwich",
+        },
+        {
+          id: "pancakes",
+          name: "Pancakes",
+          price: 450.0,
+          image: "https://placehold.co/400x400/F4A460/black?text=Pancakes",
+        },
+        {
+          id: "waffles",
+          name: "Belgian Waffles",
+          price: 475.0,
+          image: "https://placehold.co/400x400/DDA0DD/black?text=Waffles",
+        },
+        {
+          id: "muffin",
+          name: "Blueberry Muffin",
+          price: 150.0,
+          image: "https://placehold.co/400x400/5D6D7E/white?text=Muffin",
+        },
+        {
+          id: "smoothie",
+          name: "Berry Smoothie",
+          price: 299.0,
+          image: "https://placehold.co/400x400/8E44AD/white?text=Smoothie",
+        },
+        {
+          id: "nachos",
+          name: "Loaded Nachos",
+          price: 499.0,
+          image: "https://placehold.co/400x400/F1C40F/black?text=Nachos",
+        },
+        {
+          id: "hotdog",
+          name: "Classic Hotdog",
+          price: 225.0,
+          image: "https://placehold.co/400x400/D35400/white?text=Hotdog",
+        },
+        {
+          id: "onionrings",
+          name: "Onion Rings",
+          price: 199.0,
+          image: "https://placehold.co/400x400/9B59B6/white?text=Rings",
+        },
+        {
+          id: "milk",
+          name: "Milk",
+          price: 75.0,
+          image: "https://placehold.co/400x400/ECF0F1/black?text=Milk",
+        },
+        {
+          id: "brownie",
+          name: "Chocolate Brownie",
+          price: 190.0,
+          image: "https://placehold.co/400x400/512E18/white?text=Brownie",
+        },
+        // New Traditional Food Items
+        {
+          id: "biryani",
+          name: "Chicken Biryani",
+          price: 750.0,
+          image: "https://placehold.co/400x400/4CAF50/white?text=Biryani",
+        },
+        {
+          id: "tandoori",
+          name: "Tandoori Chicken",
+          price: 680.0,
+          image: "https://placehold.co/400x400/FF6347/white?text=Tandoori",
+        },
+        {
+          id: "dosa",
+          name: "Masala Dosa",
+          price: 250.0,
+          image: "https://placehold.co/400x400/FFD700/black?text=Dosa",
+        },
+        {
+          id: "paneer-tikka",
+          name: "Paneer Tikka Masala",
+          price: 650.0,
+          image: "https://placehold.co/400x400/FFA07A/white?text=Paneer+Tikka",
+        },
+      ];
+
+      const comboOffers = [
+        {
+          id: "combo1",
+          name: "Burger & Fries Combo",
+          price: 699.0,
+          items: ["burger", "fries"],
+          image: "https://placehold.co/600x600/FF5733/white?text=Burger+Combo",
+        },
+        {
+          id: "combo2",
+          name: "Pizza & Coke Deal",
+          price: 899.0,
+          items: ["pizza", "coke"],
+          image: "https://placehold.co/600x600/C70039/white?text=Pizza+Deal",
+        },
+        {
+          id: "combo3",
+          name: "Salad & Soup Special",
+          price: 420.0,
+          items: ["salad", "soup"],
+          image: "https://placehold.co/600x600/DAF7A6/black?text=Salad+Special",
+        },
+        {
+          id: "combo4",
+          name: "Wings & Shake",
+          price: 699.0,
+          items: ["wings", "shake"],
+          image: "https://placehold.co/600x600/8B0000/white?text=Wings+Shake",
+        },
+        {
+          id: "combo5",
+          name: "Smoothie & Muffin Deal",
+          price: 399.0,
+          items: ["smoothie", "muffin"],
+          image:
+            "https://placehold.co/600x600/8E44AD/white?text=Smoothie+Muffin",
+        },
+        {
+          id: "combo6",
+          name: "Coffee & Donut Special",
+          price: 199.0,
+          items: ["coffee", "donut"],
+          image: "https://placehold.co/600x600/795548/white?text=Coffee+Donut",
+        },
+      ];
+
+      const trendingItems = ["combo1", "combo2", "sushi", "wings"];
+      const fastFoodItems = ["burger", "pizza", "taco", "onionrings"];
+      const traditionalItems = ["biryani", "tandoori", "dosa", "paneer-tikka"];
+      const regularItems = ["sandwich", "salad", "pancakes", "waffles"];
+
+      let cart = [];
+      let orders = [];
+      let users = [
+        {
+          name: "Staff User",
+          email: "staff@example.com",
+          password: "password",
+          role: "staff",
+          mobile: "1234567890",
+        },
+      ];
+      let currentOrderNumber = 1001;
+      let isLoggedIn = false;
+      let userRole = null;
+      let currentUserId = null;
+
+      const authView = document.getElementById("auth-view");
+      const authTitle = document.getElementById("auth-title");
+      const authForm = document.getElementById("auth-form");
+      const authToggle = document.getElementById("auth-toggle");
+
+      const mainPage = document.getElementById("main-page");
+      const orderPage = document.getElementById("order-page");
+      const offersPage = document.getElementById("offers-page");
+      const cartView = document.getElementById("cart-view");
+      const dashboardView = document.getElementById("dashboard-view");
+      const orderConfirmationView = document.getElementById(
+        "order-confirmation-view"
+      );
+      const orderStatusView = document.getElementById("order-status-view");
+      const orderHistoryView = document.getElementById("order-history-view");
+      const profileView = document.getElementById("profile-view");
+
+      const showMainPageBtn = document.getElementById("showMainPageBtn");
+      const showOffersPageBtn = document.getElementById("showOffersPageBtn");
+      const showOrderPageBtn = document.getElementById("showOrderPageBtn");
+      const showCartPageBtn = document.getElementById("showCartPageBtn");
+      const showDashboardBtn = document.getElementById("showDashboardBtn");
+      const showOrderHistoryBtn = document.getElementById(
+        "showOrderHistoryBtn"
+      );
+      const showProfileBtn = document.getElementById("showProfileBtn");
+
+      const navLoginBtn = document.getElementById("navLoginBtn");
+      const navSignupBtn = document.getElementById("navSignupBtn");
+      const navLogoutBtn = document.getElementById("navLogoutBtn");
+
+      const menuItemsContainer = document.getElementById("menu-items");
+      const offersItemsContainer = document.getElementById("offers-items");
+      const cartItemsContainer = document.getElementById("cart-items");
+      const cartTotalSpan = document.getElementById("cart-total");
+      const checkoutBtn = document.getElementById("checkout-btn");
+      const ordersListContainer = document.getElementById("orders-list");
+      const cartEmptyMessage = document.getElementById("cart-empty-message");
+      const dashboardEmptyMessage = document.getElementById(
+        "dashboard-empty-message"
+      );
+      const historyListContainer = document.getElementById("history-list");
+      const historyEmptyMessage = document.getElementById(
+        "history-empty-message"
+      );
+      const profileDetailsContainer =
+        document.getElementById("profile-details");
+
+      const billDetailsContainer = document.getElementById("bill-items");
+      const billTotalSpan = document.getElementById("bill-total");
+      const statusOrderIdSpan = document.getElementById("status-order-id");
+      const currentOrderStatusSpan = document.getElementById(
+        "current-order-status"
+      );
+      const statusSpinner = document.getElementById("status-spinner");
+
+      const mobileMenuBtn = document.getElementById("mobile-menu-btn");
+      const navMenu = document.getElementById("nav-menu");
+      const menuIcon = document.getElementById("menu-icon");
+      const closeIcon = document.getElementById("close-icon");
+
+      let isLoginView = true;
+
+      // Function to save state to localStorage
+      function saveState() {
+        localStorage.setItem("kioskCart", JSON.stringify(cart));
+        localStorage.setItem("kioskOrders", JSON.stringify(orders));
+        localStorage.setItem("kioskUsers", JSON.stringify(users));
+        localStorage.setItem("currentOrderNumber", currentOrderNumber);
+        localStorage.setItem("isLoggedIn", isLoggedIn);
+        localStorage.setItem("userRole", userRole);
+        localStorage.setItem("currentUserId", currentUserId);
+      }
+
+      // Function to load state from localStorage
+      function loadState() {
+        const savedCart = localStorage.getItem("kioskCart");
+        const savedOrders = localStorage.getItem("kioskOrders");
+        const savedUsers = localStorage.getItem("kioskUsers");
+        const savedOrderNumber = localStorage.getItem("currentOrderNumber");
+        const savedIsLoggedIn = localStorage.getItem("isLoggedIn");
+        const savedUserRole = localStorage.getItem("userRole");
+        const savedUserId = localStorage.getItem("currentUserId");
+
+        if (savedCart) cart = JSON.parse(savedCart);
+        if (savedOrders) orders = JSON.parse(savedOrders);
+        if (savedUsers) users = JSON.parse(savedUsers);
+        if (savedOrderNumber) currentOrderNumber = parseInt(savedOrderNumber);
+        if (savedIsLoggedIn) isLoggedIn = JSON.parse(savedIsLoggedIn);
+        if (savedUserRole) userRole = savedUserRole;
+        if (savedUserId) currentUserId = savedUserId;
+      }
+
+      function renderAuthForm() {
+        if (isLoginView) {
+          authTitle.textContent = "Login";
+          authForm.innerHTML = `
+                    <div>
+                        <label for="email" class="block text-gray-700 font-semibold mb-2">Email</label>
+                        <input type="email" id="email" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label for="password" class="block text-gray-700 font-semibold mb-2">Password</label>
+                        <input type="password" id="password" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <a href="#" id="forgot-password" class="text-sm text-blue-600 mt-2 inline-block">Forgot Password?</a>
+                    </div>
+                    <button type="submit" class="w-full bg-blue-600 text-white font-semibold py-3 rounded-full shadow-md">Login</button>
+                `;
+          authToggle.innerHTML = `Don't have an account? <button class="text-blue-600 font-semibold">Sign Up</button>`;
+          document
+            .getElementById("forgot-password")
+            .addEventListener("click", (e) => {
+              e.preventDefault();
+              showPopup(
+                "This is a frontend-only demo. Password reset functionality is not available."
+              );
+            });
+        } else {
+          authTitle.textContent = "Sign Up";
+          authForm.innerHTML = `
+                    <div>
+                        <label for="name" class="block text-gray-700 font-semibold mb-2">Full Name</label>
+                        <input type="text" id="name" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label for="email" class="block text-gray-700 font-semibold mb-2">Email</label>
+                        <input type="email" id="email" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label for="mobile" class="block text-gray-700 font-semibold mb-2">Mobile Number</label>
+                        <input type="tel" id="mobile" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label for="password" class="block text-gray-700 font-semibold mb-2">Password</label>
+                        <input type="password" id="password" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <button type="submit" class="w-full bg-blue-600 text-white font-semibold py-3 rounded-full shadow-md">Sign Up</button>
+                `;
+          authToggle.innerHTML = `Already have an account? <button class="text-blue-600 font-semibold">Login</button>`;
+        }
+      }
+
+      function renderHomePageContent() {
+        mainPage.innerHTML = `
+                <div class="text-center p-8 sm:p-12">
+                    <h1 class="text-4xl sm:text-5xl md:text-6xl font-extrabold text-gradient mb-4">Welcome to Keshav Restaurant!</h1>
+                    <p class="text-base sm:text-lg md:text-xl text-gray-700 mb-6 sm:mb-8">Explore our menu and offers, and sign in to place an order!</p>
+                </div>
+
+                <!-- Trending Section -->
+                <div class="w-full max-w-7xl mx-auto mt-8 p-4 sm:p-6 bg-white rounded-2xl shadow-xl border border-gray-200">
+                    <h2 class="text-3xl font-extrabold text-center mb-6 text-gradient">Trending Now</h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" id="trending-section"></div>
+                </div>
+
+                <!-- Traditional Section -->
+                <div class="w-full max-w-7xl mx-auto mt-8 p-4 sm:p-6 bg-white rounded-2xl shadow-xl border border-gray-200">
+                    <h2 class="text-3xl font-extrabold text-center mb-6 text-gradient">Traditional Dishes</h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" id="traditional-section"></div>
+                </div>
+                
+                <!-- Fast Food Section -->
+                <div class="w-full max-w-7xl mx-auto mt-8 p-4 sm:p-6 bg-white rounded-2xl shadow-xl border border-gray-200">
+                    <h2 class="text-3xl font-extrabold text-center mb-6 text-gradient">Fast Food</h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" id="fast-food-section"></div>
+                </div>
+
+                <!-- Regular Food Section -->
+                <div class="w-full max-w-7xl mx-auto mt-8 p-4 sm:p-6 bg-white rounded-2xl shadow-xl border border-gray-200">
+                    <h2 class="text-3xl font-extrabold text-center mb-6 text-gradient">Regular Eats</h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" id="regular-section"></div>
+                </div>
+            `;
+
+        renderSection(
+          "trending-section",
+          trendingItems
+            .map(
+              (id) =>
+                menuItems.find((item) => item.id === id) ||
+                comboOffers.find((item) => item.id === id)
+            )
+            .filter((item) => item)
+        );
+        renderSection(
+          "fast-food-section",
+          fastFoodItems
+            .map(
+              (id) =>
+                menuItems.find((item) => item.id === id) ||
+                comboOffers.find((item) => item.id === id)
+            )
+            .filter((item) => item)
+        );
+        renderSection(
+          "traditional-section",
+          traditionalItems
+            .map(
+              (id) =>
+                menuItems.find((item) => item.id === id) ||
+                comboOffers.find((item) => item.id === id)
+            )
+            .filter((item) => item)
+        );
+        renderSection(
+          "regular-section",
+          regularItems
+            .map(
+              (id) =>
+                menuItems.find((item) => item.id === id) ||
+                comboOffers.find((item) => item.id === id)
+            )
+            .filter((item) => item)
+        );
+
+        attachCartListeners();
+      }
+
+      function renderSection(containerId, items) {
+        const container = document.getElementById(containerId);
+        if (container) {
+          container.innerHTML = items
+            .map(
+              (item) => `
+                    <div class="bg-white rounded-xl shadow-lg p-4 flex flex-col items-center text-center border border-gray-200">
+                        <img src="${item.image}" alt="${
+                item.name
+              }" class="w-24 h-24 object-cover rounded-lg mb-4 border border-gray-300">
+                        <h4 class="text-lg font-semibold text-gray-800">${
+                          item.name
+                        }</h4>
+                        <p class="text-gray-600 mb-2">₹${item.price.toFixed(
+                          2
+                        )}</p>
+                        <button data-id="${
+                          item.id
+                        }" class="add-to-cart-btn mt-auto w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-full">
+                            Add to Cart
+                        </button>
+                    </div>
+                `
+            )
+            .join("");
+        }
+      }
+
+      function renderMenuItems() {
+        menuItemsContainer.innerHTML = menuItems
+          .map(
+            (item) => `
+                <div class="bg-white rounded-xl shadow-lg p-4 flex flex-col items-center text-center border border-gray-200">
+                        <img src="${item.image}" alt="${
+              item.name
+            }" class="w-24 h-24 object-cover rounded-lg mb-4 border border-gray-300">
+                    <h4 class="text-lg font-semibold text-gray-800">${
+                      item.name
+                    }</h4>
+                    <p class="text-gray-600 mb-2">₹${item.price.toFixed(2)}</p>
+                    <button data-id="${
+                      item.id
+                    }" class="add-to-cart-btn mt-auto w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-full">
+                        Add to Cart
+                    </button>
+                </div>
+            `
+          )
+          .join("");
+      }
+
+      function renderOffers() {
+        offersItemsContainer.innerHTML = comboOffers
+          .map(
+            (offer) => `
+                <div class="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center text-center border-2 border-gray-600">
+                    <img src="${offer.image}" alt="${
+              offer.name
+            }" class="w-32 h-32 object-cover rounded-full mb-4 border-2 border-gray-600">
+                    <h4 class="text-xl font-bold text-gray-800">${
+                      offer.name
+                    }</h4>
+                    <p class="text-gray-600 font-bold text-2xl mb-2">₹${offer.price.toFixed(
+                      2
+                    )}</p>
+                    <p class="text-gray-500 mb-4">${offer.items
+                      .map(
+                        (itemId) =>
+                          menuItems.find((item) => item.id === itemId)?.name ||
+                          ""
+                      )
+                      .join(" + ")}</p>
+                    <button data-id="${
+                      offer.id
+                    }" class="add-to-cart-btn mt-auto w-full bg-gray-600 text-white font-semibold py-2 px-4 rounded-full">
+                        Add to Cart
+                    </button>
+                </div>
+            `
+          )
+          .join("");
+      }
+
+      function renderCartPage() {
+        // Update the main cart view
+        if (cart.length === 0) {
+          cartItemsContainer.innerHTML = "";
+          cartEmptyMessage.classList.remove("hidden");
+        } else {
+          cartEmptyMessage.classList.add("hidden");
+          cartItemsContainer.innerHTML = cart
+            .map(
+              (item) => `
+                    <div class="flex items-center justify-between bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                        <div class="flex-1">
+                            <span class="font-medium text-gray-700">${
+                              item.name
+                            }</span>
+                            <span class="text-gray-500"> x${
+                              item.quantity
+                            }</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="font-semibold text-gray-800">₹${(
+                              item.price * item.quantity
+                            ).toFixed(2)}</span>
+                            <button data-id="${
+                              item.id
+                            }" class="remove-from-cart-btn text-red-500">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                  <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm6 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                `
+            )
+            .join("");
+        }
+        const total = cart.reduce(
+          (sum, item) => sum + item.price * item.quantity,
+          0
+        );
+        cartTotalSpan.textContent = `₹${total.toFixed(2)}`;
+        attachCartListeners();
+      }
+
+      function updateCart() {
+        // This function is now simplified as the cart popover has been removed
+        const total = cart.reduce(
+          (sum, item) => sum + item.price * item.quantity,
+          0
+        );
+
+        attachCartListeners();
+        saveState();
+      }
+
+      function attachCartListeners() {
+        document.querySelectorAll(".add-to-cart-btn").forEach((button) => {
+          button.removeEventListener("click", addToCart); // Prevent duplicate listeners
+          button.addEventListener("click", addToCart);
+        });
+        document.querySelectorAll(".remove-from-cart-btn").forEach((button) => {
+          button.removeEventListener("click", removeFromCart); // Prevent duplicate listeners
+          button.addEventListener("click", removeFromCart);
+        });
+      }
+
+      function showPopup(message) {
+        // Remove existing popups to prevent stacking
+        const existingPopup = document.getElementById("kiosk-popup");
+        if (existingPopup) {
+          existingPopup.remove();
+        }
+
+        const popup = document.createElement("div");
+        popup.id = "kiosk-popup";
+        popup.className =
+          "fixed top-10 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-6 py-3 rounded-full shadow-lg z-50 opacity-0";
+        popup.textContent = message;
+        document.body.appendChild(popup);
+
+        // Fade in and then fade out after a delay
+        requestAnimationFrame(() => {
+          popup.classList.remove("opacity-0");
+          popup.classList.add("opacity-100");
+        });
+
+        setTimeout(() => {
+          popup.classList.remove("opacity-100");
+          popup.classList.add("opacity-0");
+          setTimeout(() => popup.remove(), 500); // Remove element after transition
+        }, 2000);
+      }
+
+      function showDeliveredMessage(orderId) {
+        const deliveredMessage = document.createElement("div");
+        deliveredMessage.className =
+          "fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-75 z-50";
+        deliveredMessage.innerHTML = `
+                <div class="bg-white p-8 rounded-lg shadow-2xl text-center max-w-sm">
+                    <h3 class="text-2xl font-bold mb-4 text-green-600">Order Delivered!</h3>
+                    <p class="text-gray-700">Order <span class="font-extrabold text-blue-600 text-xl">#${orderId}</span> has been marked as delivered.</p>
+                    <button class="mt-6 bg-blue-600 text-white font-semibold py-2 px-6 rounded-full close-message">OK</button>
+                </div>
+            `;
+        document.body.appendChild(deliveredMessage);
+        document
+          .querySelector(".close-message")
+          .addEventListener("click", () => {
+            deliveredMessage.remove();
+          });
+      }
+
+      function addToCart(e) {
+        if (!isLoggedIn) {
+          showPopup("Please login or sign up to add items to your cart.");
+          return;
+        }
+        const itemId = e.target.dataset.id;
+        const item =
+          menuItems.find((i) => i.id === itemId) ||
+          comboOffers.find((o) => o.id === itemId);
+        if (item) {
+          if (item.id.startsWith("combo")) {
+            const comboItems = item.items.map((id) =>
+              menuItems.find((i) => i.id === id)
+            );
+            cart.push({ ...item, quantity: 1, type: "combo", comboItems });
+          } else {
+            const existingCartItem = cart.find(
+              (i) => i.id === itemId && i.type !== "combo"
+            );
+            if (existingCartItem) {
+              existingCartItem.quantity++;
+            } else {
+              cart.push({ ...item, quantity: 1, type: "single" });
+            }
+          }
+          updateCart();
+          saveState();
+          showPopup(`${item.name} added to cart!`);
+        }
+      }
+
+      function removeFromCart(e) {
+        const itemId = e.currentTarget.dataset.id;
+        cart = cart.filter((item) => item.id !== itemId);
+        updateCart();
+        saveState();
+        renderCartPage();
+      }
+
+      function renderOrders() {
+        if (orders.length === 0) {
+          ordersListContainer.innerHTML = "";
+          dashboardEmptyMessage.classList.remove("hidden");
+        } else {
+          dashboardEmptyMessage.classList.add("hidden");
+          ordersListContainer.innerHTML = orders
+            .map(
+              (order) => `
+                    <div class="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+                        <div class="flex justify-between items-center mb-4">
+                            <h4 class="text-xl font-bold text-gray-800">Order #${
+                              order.id
+                            }</h4>
+                            <span class="text-sm font-semibold px-3 py-1 rounded-full ${
+                              order.status === "New"
+                                ? "bg-red-500 text-white"
+                                : order.status === "Ready"
+                                ? "bg-yellow-500 text-white"
+                                : "bg-green-500 text-white"
+                            }">
+                                ${order.status}
+                            </span>
+                        </div>
+                        <ul class="text-gray-700 mb-4">
+                            ${order.items
+                              .map(
+                                (item) =>
+                                  `<li>${item.name} x${item.quantity} - ₹${(
+                                    item.price * item.quantity
+                                  ).toFixed(2)}</li>`
+                              )
+                              .join("")}
+                        </ul>
+                        <p class="font-bold text-gray-800">Total: ₹${order.total.toFixed(
+                          2
+                        )}</p>
+                        <div class="mt-4 flex space-x-2">
+                            <button data-id="${
+                              order.id
+                            }" data-status="Ready" class="change-status-btn flex-1 bg-yellow-500 text-white py-2 px-4 rounded-full text-sm font-semibold disabled:opacity-50" ${
+                order.status !== "New" ? "disabled" : ""
+              }>
+                                Mark Ready
+                            </button>
+                            <button data-id="${
+                              order.id
+                            }" data-status="Completed" class="change-status-btn flex-1 bg-green-500 text-white py-2 px-4 rounded-full text-sm font-semibold disabled:opacity-50" ${
+                order.status !== "Ready" ? "disabled" : ""
+              }>
+                                Mark Completed
+                            </button>
+                        </div>
+                    </div>
+                `
+            )
+            .join("");
+          document.querySelectorAll(".change-status-btn").forEach((button) => {
+            button.addEventListener("click", (e) => {
+              const orderId = parseInt(e.currentTarget.dataset.id);
+              const newStatus = e.currentTarget.dataset.status;
+              const order = orders.find((o) => o.id === orderId);
+              if (order) {
+                order.status = newStatus;
+                saveState();
+                if (newStatus === "Completed") {
+                  showDeliveredMessage(orderId);
+                }
+                renderOrders();
+              }
+            });
+          });
+        }
+      }
+
+      function renderOrderHistory() {
+        const userOrders = orders.filter(
+          (order) =>
+            order.userId === currentUserId && order.status === "Completed"
+        );
+        if (userOrders.length === 0) {
+          historyListContainer.innerHTML = "";
+          historyEmptyMessage.classList.remove("hidden");
+        } else {
+          historyEmptyMessage.classList.add("hidden");
+          historyListContainer.innerHTML = userOrders
+            .map(
+              (order) => `
+                    <div class="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+                        <div class="flex justify-between items-center mb-4">
+                            <h4 class="text-xl font-bold text-gray-800">Order #${
+                              order.id
+                            }</h4>
+                            <span class="text-sm font-semibold px-3 py-1 rounded-full bg-green-500 text-white">
+                                Delivered
+                            </span>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 text-left mb-4">
+                            <h5 class="font-semibold text-gray-800 mb-2">Order Details:</h5>
+                            <div class="text-gray-600 text-sm space-y-1">
+                                ${order.items
+                                  .map(
+                                    (item) => `
+                                    <div class="flex justify-between">
+                                        <span>${item.name} x${
+                                      item.quantity
+                                    }</span>
+                                        <span>₹${(
+                                          item.price * item.quantity
+                                        ).toFixed(2)}</span>
+                                    </div>
+                                `
+                                  )
+                                  .join("")}
+                            </div>
+                            <div class="border-t border-gray-300 pt-2 mt-2 flex justify-between font-bold text-gray-800">
+                                <span>Total:</span>
+                                <span>₹${order.total.toFixed(2)}</span>
+                            </div>
+                        </div>
+                    </div>
+                `
+            )
+            .join("");
+        }
+      }
+
+      function renderProfile() {
+        const user = users.find((u) => u.email === currentUserId);
+        if (user) {
+          profileDetailsContainer.innerHTML = `
+                    <div class="flex items-center space-x-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                        </svg>
+                        <div>
+                            <p class="text-2xl font-bold text-gray-800">${user.name}</p>
+                            <p class="text-gray-600">${user.email}</p>
+                        </div>
+                    </div>
+                    <div class="border-t border-gray-200 pt-4 mt-4 space-y-2">
+                        <div class="flex items-center text-gray-700">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 1.48a1 1 0 01-.19.986l-1.48 1.48a1 1 0 01-.986.19l-1.48-.74a1 1 0 01-.836-.986V3z" />
+                                <path d="M14.494 2.153a1 1 0 01.836.986l.74 1.48a1 1 0 01-.19.986l-1.48 1.48a1 1 0 01-.986.19l-1.48-.74a1 1 0 01-.836-.986V3a1 1 0 011-1h2.153z" />
+                                <path fill-rule="evenodd" d="M12.441 6.136l-1.48 1.48a1 1 0 01-1.28.14l-2.843-1.421a1.999 1.999 0 01-1.754-.001l-.81-.405a1 1 0 00-.986-.19L3 5.4a1 1 0 01-.19-.986l.74-1.48a1 1 0 01.836-.836h2.153a1 1 0 01.986.836l.74 1.48a1 1 0 01-.19.986l-1.48 1.48a1 1 0 00-.19.986l-.81.405a1 1 0 00-.339.819l-.71 2.843c-.134.529.189.969.819.339l2.293-2.293a1 1 0 011.28-.14l2.843 1.421a1.999 1.999 0 011.754-.001l.81.405a1 1 0 00.986.19l1.48-.74a1 1 0 01.836-.986h2.153a1 1 0 01.986.836l.74 1.48a1 1 0 01-.19.986l-1.48 1.48a1 1 0 00-.19.986l-.81.405a1 1 0 00-.339.819l-.71 2.843c-.134.529.189.969.819.339l2.293-2.293a1 1 0 011.28-.14l1.421 2.843a1 1 0 01-.71 1.28l-2.843.71c-.529.134-.969-.189-.819-.339l2.293-2.293a1 1 0 00-.14-1.28l-1.48-1.48a1 1 0 00-.986-.19z" clip-rule="evenodd" />
+                            </svg>
+                            <span>Mobile: ${user.mobile}</span>
+                        </div>
+                    </div>
+                `;
+        } else {
+          profileDetailsContainer.innerHTML = `<p class="text-center text-gray-500">Please log in to view your profile.</p>`;
+        }
+      }
+
+      function showView(viewId) {
+        if (viewId === "dashboard-view" && userRole !== "staff") {
+          showPopup("Access Denied: Staff only");
+          return;
+        }
+        if (
+          (viewId === "order-history-view" ||
+            viewId === "cart-view" ||
+            viewId === "profile-view") &&
+          !isLoggedIn
+        ) {
+          showPopup("Please login to access this section.");
+          return;
+        }
+
+        const views = {
+          "auth-view": authView,
+          "main-page": mainPage,
+          "order-page": orderPage,
+          "offers-page": offersPage,
+          "cart-view": cartView,
+          "dashboard-view": dashboardView,
+          "order-confirmation-view": orderConfirmationView,
+          "order-status-view": orderStatusView,
+          "order-history-view": orderHistoryView,
+          "profile-view": profileView,
+        };
+        for (const id in views) {
+          views[id].classList.add("hidden");
+        }
+        views[viewId].classList.remove("hidden");
+
+        // Remove navigation button highlight effect
+        // const navButtons = [showMainPageBtn, showOffersPageBtn, showOrderPageBtn, showCartPageBtn, showDashboardBtn, showOrderHistoryBtn, showProfileBtn];
+        // navButtons.forEach(btn => btn.classList.remove('bg-gray-200', 'text-gray-800'));
+
+        if (viewId === "dashboard-view") {
+          renderOrders();
+        } else if (viewId === "main-page") {
+          renderHomePageContent();
+        } else if (viewId === "offers-page") {
+          // No highlight
+        } else if (viewId === "order-page") {
+          // No highlight
+        } else if (viewId === "cart-view") {
+          renderCartPage();
+        } else if (viewId === "order-history-view") {
+          renderOrderHistory();
+        } else if (viewId === "profile-view") {
+          renderProfile();
+        }
+      }
+
+      function updateNav() {
+        if (isLoggedIn) {
+          navLoginBtn.classList.add("hidden");
+          navSignupBtn.classList.add("hidden");
+          navLogoutBtn.classList.remove("hidden");
+          showOffersPageBtn.classList.remove("hidden");
+          showOrderPageBtn.classList.remove("hidden");
+          showCartPageBtn.classList.remove("hidden");
+          showOrderHistoryBtn.classList.remove("hidden");
+          showProfileBtn.classList.remove("hidden");
+          if (userRole === "staff") {
+            showDashboardBtn.classList.remove("hidden");
+          } else {
+            showDashboardBtn.classList.add("hidden");
+          }
+        } else {
+          navLoginBtn.classList.remove("hidden");
+          navSignupBtn.classList.add("hidden");
+          navLogoutBtn.classList.add("hidden");
+          showOffersPageBtn.classList.remove("hidden");
+          showOrderPageBtn.classList.remove("hidden");
+          showCartPageBtn.classList.add("hidden");
+          showDashboardBtn.classList.add("hidden");
+          showOrderHistoryBtn.classList.add("hidden");
+          showProfileBtn.classList.add("hidden");
+        }
+        saveState();
+      }
+
+      function login(email, password) {
+        const user = users.find(
+          (u) => u.email === email && u.password === password
+        );
+        if (user) {
+          isLoggedIn = true;
+          userRole = user.role;
+          currentUserId = user.email;
+          updateNav();
+          showPopup(`Welcome, ${user.name || user.email}!`);
+          showView("main-page");
+          saveState();
+        } else {
+          showPopup("Invalid email or password.");
+        }
+      }
+
+      function signup(name, email, mobile, password) {
+        const existingUser = users.find((u) => u.email === email);
+        if (existingUser) {
+          showPopup("An account with this email already exists.");
+          return;
+        }
+        users.push({ name, email, mobile, password, role: "customer" });
+        showPopup("Account created! Please log in.");
+        isLoginView = true;
+        renderAuthForm();
+        showView("auth-view");
+        saveState();
+      }
+
+      // Event Listeners
+      showMainPageBtn.addEventListener("click", () => showView("main-page"));
+      showOffersPageBtn.addEventListener("click", () =>
+        showView("offers-page")
+      );
+      showOrderPageBtn.addEventListener("click", () => showView("order-page"));
+      showCartPageBtn.addEventListener("click", () => showView("cart-view"));
+      showDashboardBtn.addEventListener("click", () =>
+        showView("dashboard-view")
+      );
+      showOrderHistoryBtn.addEventListener("click", () =>
+        showView("order-history-view")
+      );
+      showProfileBtn.addEventListener("click", () => showView("profile-view"));
+
+      navLoginBtn.addEventListener("click", () => {
+        isLoginView = true;
+        renderAuthForm();
+        showView("auth-view");
+      });
+
+      navSignupBtn.addEventListener("click", () => {
+        isLoginView = false;
+        renderAuthForm();
+        showView("auth-view");
+      });
+
+      navLogoutBtn.addEventListener("click", () => {
+        isLoggedIn = false;
+        userRole = null;
+        currentUserId = null;
+        updateNav();
+        showView("main-page");
+        showPopup("Logged out successfully.");
+        saveState();
+      });
+
+      authForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        if (isLoginView) {
+          const email = document.getElementById("email").value;
+          const password = document.getElementById("password").value;
+          login(email, password);
+        } else {
+          const name = document.getElementById("name").value;
+          const email = document.getElementById("email").value;
+          const mobile = document.getElementById("mobile").value;
+          const password = document.getElementById("password").value;
+          signup(name, email, mobile, password);
+        }
+      });
+
+      authToggle.addEventListener("click", () => {
+        isLoginView = !isLoginView;
+        renderAuthForm();
+      });
+
+      checkoutBtn.addEventListener("click", () => {
+        if (!isLoggedIn) {
+          showPopup("Please login or sign up to complete your order.");
+          return;
+        }
+        if (cart.length > 0) {
+          const total = cart.reduce(
+            (sum, item) => sum + item.price * item.quantity,
+            0
+          );
+          const newOrder = {
+            id: currentOrderNumber++,
+            userId: currentUserId,
+            items: [...cart],
+            total: total,
+            status: "New",
+          };
+          orders.push(newOrder);
+          saveState();
+
+          // Render bill details
+          billDetailsContainer.innerHTML = cart
+            .map(
+              (item) => `
+                    <div class="flex justify-between text-sm">
+                        <span>${item.name} x${item.quantity}</span>
+                        <span>₹${(item.price * item.quantity).toFixed(2)}</span>
+                    </div>
+                `
+            )
+            .join("");
+          billTotalSpan.textContent = `₹${newOrder.total.toFixed(2)}`;
+
+          cart = []; // Clear the cart
+          updateCart();
+
+          showView("order-status-view");
+
+          // Set initial status and then update after a delay
+          statusOrderIdSpan.textContent = newOrder.id;
+          currentOrderStatusSpan.textContent = "On the way";
+          statusSpinner.classList.remove("hidden");
+
+          setTimeout(() => {
+            const order = orders.find((o) => o.id === newOrder.id);
+            if (order) {
+              order.status = "Completed";
+              currentOrderStatusSpan.textContent = "Delivered";
+              statusSpinner.classList.add("hidden");
+              showPopup(`Order #${order.id} has been delivered!`);
+              saveState();
+            }
+          }, 5000); // 5-second simulated delivery
+        }
+      });
+
+      mobileMenuBtn.addEventListener("click", () => {
+        const navMenu = document.getElementById("nav-menu");
+        navMenu.classList.toggle("hidden");
+        navMenu.classList.toggle("flex");
+        menuIcon.classList.toggle("hidden");
+        closeIcon.classList.toggle("hidden");
+      });
+
+      // Initial render
+      loadState();
+      renderMenuItems();
+      renderOffers();
+      updateCart();
+      updateNav();
+      showView("main-page");
+    </script>
+  </body>
+</html>
